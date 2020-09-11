@@ -13,5 +13,13 @@ git clone https://github.com/ashimroy/EGMObjectDumper
 
 scram b -j8
 
-cmsRun egmNtuplizer/python/ConfFile_cfg.py
+cmsRun EGMObjectDumper/egmNtuplizer/python/ConfFile_cfg.py
 
+
+How to submit CRAB jobs?
+
+cd EGMObjectDumper/egmNtuplizer/test
+
+source set_env.sh   ## It will ask for grid password.
+
+python egmNtuple_CrabSubmit.py  ## You can edit this file on your requirement. 
