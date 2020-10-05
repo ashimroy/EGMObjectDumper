@@ -48,6 +48,8 @@ process.egmNtuplizer = cms.EDAnalyzer('egmNtuplizer',
                                       doGenParticles       = cms.bool(True),
                                       runOnParticleGun     = cms.bool(False),
                                       runOnSherpa          = cms.bool(False),
+                                      dumpPDFSystWeight    = cms.bool(False),
+                                      dumpGenScaleSystWeights = cms.bool(False),
 
                                       VtxLabel             = cms.InputTag("offlineSlimmedPrimaryVertices"),
 #                                      VtxBSLabel           = cms.InputTag("offlinePrimaryVerticesWithBS"),

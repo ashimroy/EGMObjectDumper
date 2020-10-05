@@ -34,9 +34,11 @@ egmNtuplizer::egmNtuplizer(const edm::ParameterSet& iConfig)
 #endif
 
   doGenParticles_            =                                          iConfig.getParameter<bool>("doGenParticles");  
-  newparticles_              =                                          iConfig.getParameter< vector<int > >("newParticles");
   runOnParticleGun_          =                                          iConfig.getParameter<bool>("runOnParticleGun");
   runOnSherpa_               =                                          iConfig.getParameter<bool>("runOnSherpa");
+  dumpPDFSystWeight_         =                                          iConfig.getParameter<bool>("dumpPDFSystWeight");
+  dumpGenScaleSystWeights_   =                                          iConfig.getParameter<bool>("dumpGenScaleSystWeights");
+  newparticles_              =                                          iConfig.getParameter< vector<int > >("newParticles");
 
   vtxLabel_                  = consumes<reco::VertexCollection>        (iConfig.getParameter<InputTag>("VtxLabel"));
   //vtxBSLabel_                = consumes<reco::VertexCollection>        (iConfig.getParameter<InputTag>("VtxBSLabel"));
@@ -55,7 +57,7 @@ egmNtuplizer::egmNtuplizer(const edm::ParameterSet& iConfig)
   tree = fs->make<TTree>("EventTree", "EventInfo");
 
   if (doGenParticles_) {
-    //branchesGenInfo(tree, fs);
+    branchesGenInfo(tree, fs);
     branchesGenPart(tree);
   }
 
@@ -86,7 +88,7 @@ void egmNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   //AR }
 
   if (!iEvent.isRealData()) {
-    //fillGenInfo(iEvent);
+    fillGenInfo(iEvent);
     if (doGenParticles_)
       fillGenPart(iEvent);
   }

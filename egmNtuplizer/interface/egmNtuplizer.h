@@ -72,6 +72,7 @@ public:
 
   bool doGenParticles_;
   bool dumpPDFSystWeight_;
+  bool dumpGenScaleSystWeights_;
   bool runOnParticleGun_;
   bool runOnSherpa_;
 

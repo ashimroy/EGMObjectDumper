@@ -19,6 +19,7 @@ float            genPho2_;
 TString          EventTag_;
 float            pdfWeight_;     
 vector<float>    pdfSystWeight_;
+vector<float>    genScaleSystWeights_;
 Int_t            nLHE_;
 vector<int>      lhePID;
 vector<float>    lhePx;
@@ -118,7 +119,7 @@ float getGenTrkIso(edm::Handle<reco::GenParticleCollection> handle,
 
    return ptSum;
 }
-/*
+// /*
 void egmNtuplizer::branchesGenInfo(TTree* tree, edm::Service<TFileService> &fs) {
 
   tree->Branch("pdf",           &pdf_);
@@ -131,6 +132,9 @@ void egmNtuplizer::branchesGenInfo(TTree* tree, edm::Service<TFileService> &fs) 
   if (dumpPDFSystWeight_) {
     tree->Branch("pdfWeight",     &pdfWeight_);
     tree->Branch("pdfSystWeight", &pdfSystWeight_);
+  }
+  if (dumpGenScaleSystWeights_) {
+    tree->Branch("genScaleSystWeights", &genScaleSystWeights_);
   }
   tree->Branch("EventTag",      &EventTag_);
 
@@ -145,13 +149,13 @@ void egmNtuplizer::branchesGenInfo(TTree* tree, edm::Service<TFileService> &fs) 
   tree->Branch("lhePz",         &lhePz); 
   tree->Branch("lheE",          &lheE); 
   
-  hPU_        = fs->make<TH1F>("hPU",        "number of pileup",      200,  0, 200);
-  hPUTrue_    = fs->make<TH1F>("hPUTrue",    "number of true pilepu", 1000, 0, 200);
-  hGenWeight_ = fs->make<TH1F>("hGenWeight", "Gen weights",           2,    0, 2);
-  hSumGenWeight_ = fs->make<TH1F>("hSumGenWeight", "Sum of Gen weights",1,  0, 1);
+  //hPU_        = fs->make<TH1F>("hPU",        "number of pileup",      200,  0, 200);
+  //hPUTrue_    = fs->make<TH1F>("hPUTrue",    "number of true pilepu", 1000, 0, 200);
+  //hGenWeight_ = fs->make<TH1F>("hGenWeight", "Gen weights",           2,    0, 2);
+  //hSumGenWeight_ = fs->make<TH1F>("hSumGenWeight", "Sum of Gen weights",1,  0, 1);
   
 }
-*/
+// */
 void egmNtuplizer::branchesGenPart(TTree* tree) {
 
   tree->Branch("nMC",          &nMC_);
@@ -180,7 +184,7 @@ void egmNtuplizer::branchesGenPart(TTree* tree) {
   tree->Branch("mcCalIsoDR04", &mcCalIsoDR04);
   tree->Branch("mcTrkIsoDR04", &mcTrkIsoDR04);
 }
-/*
+// /*
 void egmNtuplizer::fillGenInfo(const edm::Event& e) {
 
   // cleanup from previous execution
@@ -223,10 +227,12 @@ void egmNtuplizer::fillGenInfo(const edm::Event& e) {
       pthat_ = genEventInfoHandle->binningValues()[0];
     processID_ = genEventInfoHandle->signalProcessID();
     genWeight_ = genEventInfoHandle->weight();
+    /* //AR 
     if (genWeight_ >= 0) hGenWeight_->Fill(0.5);    
     else hGenWeight_->Fill(1.5);
     if (abs(genWeight_)>1) hSumGenWeight_->Fill(0.5,genWeight_/abs(genWeight_));
     else hSumGenWeight_->Fill(0.5,genWeight_);
+    */
   } else
     edm::LogWarning("egmNtuplizer") << "no GenEventInfoProduct in event";
 
@@ -239,6 +245,19 @@ void egmNtuplizer::fillGenInfo(const edm::Event& e) {
   double lhePho1 = 0.;
   double lhePho2 = 0.;
   if (lheEventProduct.isValid()){
+
+    if (dumpGenScaleSystWeights_) {
+      genScaleSystWeights_.push_back(lheEventProduct->weights()[0].wgt/lheEventProduct->originalXWGTUP()); //id="1001" muR=1 muF=1 
+      genScaleSystWeights_.push_back(lheEventProduct->weights()[1].wgt/lheEventProduct->originalXWGTUP());//id="1002" muR=1 muF=2 
+      genScaleSystWeights_.push_back(lheEventProduct->weights()[2].wgt/lheEventProduct->originalXWGTUP());//id="1003" muR=1 muF=0.5 
+      genScaleSystWeights_.push_back(lheEventProduct->weights()[3].wgt/lheEventProduct->originalXWGTUP());//id="1004" muR=2 muF=1 
+      genScaleSystWeights_.push_back(lheEventProduct->weights()[4].wgt/lheEventProduct->originalXWGTUP());//id="1005" muR=2 muF=2 
+      genScaleSystWeights_.push_back(lheEventProduct->weights()[5].wgt/lheEventProduct->originalXWGTUP());//id="1006" muR=2 muF=0.5 
+      genScaleSystWeights_.push_back(lheEventProduct->weights()[6].wgt/lheEventProduct->originalXWGTUP());//id="1007" muR=0.5 muF=1 
+      genScaleSystWeights_.push_back(lheEventProduct->weights()[7].wgt/lheEventProduct->originalXWGTUP());//id="1008" muR=0.5 muF=2 
+      genScaleSystWeights_.push_back(lheEventProduct->weights()[8].wgt/lheEventProduct->originalXWGTUP());//id="1009" muR=0.5 muF=0.5 
+    }
+
     const lhef::HEPEUP& lheEvent = lheEventProduct->hepeup();
     std::vector<lhef::HEPEUP::FiveVector> lheParticles = lheEvent.PUP;
     size_t numParticles = lheParticles.size();
@@ -300,8 +319,8 @@ void egmNtuplizer::fillGenInfo(const edm::Event& e) {
   if (genPileupHandle.isValid()) {
     for (vector<PileupSummaryInfo>::const_iterator pu = genPileupHandle->begin(); pu != genPileupHandle->end(); ++pu) {
       if (pu->getBunchCrossing() == 0) {
-        hPU_->Fill(pu->getPU_NumInteractions());
-        hPUTrue_->Fill(pu->getTrueNumInteractions());
+        //AR hPU_->Fill(pu->getPU_NumInteractions());
+        //AR hPUTrue_->Fill(pu->getTrueNumInteractions());
       }
 
       nPU_   .push_back(pu->getPU_NumInteractions());
@@ -315,7 +334,7 @@ void egmNtuplizer::fillGenInfo(const edm::Event& e) {
     edm::LogWarning("egmNtuplizer") << "no PileupSummaryInfo in event";
 
 }
-*/
+// */
 void egmNtuplizer::fillGenPart(const edm::Event& e) {
 
   mcPID       .clear();
