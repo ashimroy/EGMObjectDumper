@@ -18,6 +18,7 @@ vector<float>  phoCalibE_;
 vector<float>  phoCalibEt_;
 vector<float>  phoSCE_;
 vector<float>  phoSCRawE_;
+vector<float>  phoESEn_;
 vector<float>  phoESEnP1_;
 vector<float>  phoESEnP2_;
 vector<float>  phoSCEta_;
@@ -85,6 +86,7 @@ void egmNtuplizer::branchesPhotons(TTree* tree) {
   //tree->Branch("phoCalibEt",              &phoCalibEt_);
   tree->Branch("phoSCE",                  &phoSCE_);
   tree->Branch("phoSCRawE",               &phoSCRawE_);
+  tree->Branch("phoESEn",                 &phoESEn_);
   tree->Branch("phoESEnP1",               &phoESEnP1_);
   tree->Branch("phoESEnP2",               &phoESEnP2_);
   tree->Branch("phoSCEta",                &phoSCEta_);
@@ -139,6 +141,7 @@ void egmNtuplizer::fillPhotons(const edm::Event& iEvent, const edm::EventSetup& 
   phoCalibEt_             .clear();
   phoSCE_                 .clear();
   phoSCRawE_              .clear();
+  phoESEn_                .clear();
   phoESEnP1_              .clear();
   phoESEnP2_              .clear();
   phoSCEta_               .clear();
@@ -200,6 +203,7 @@ void egmNtuplizer::fillPhotons(const edm::Event& iEvent, const edm::EventSetup& 
     phoPhi_             .push_back(iPho->phi());
     phoSCE_             .push_back((*iPho).superCluster()->energy());
     phoSCRawE_          .push_back((*iPho).superCluster()->rawEnergy());
+    phoESEn_            .push_back((*iPho).superCluster()->preshowerEnergy());
     phoESEnP1_          .push_back((*iPho).superCluster()->preshowerEnergyPlane1());
     phoESEnP2_          .push_back((*iPho).superCluster()->preshowerEnergyPlane2());
     phoSCEta_           .push_back((*iPho).superCluster()->eta());
@@ -218,12 +222,12 @@ void egmNtuplizer::fillPhotons(const edm::Event& iEvent, const edm::EventSetup& 
     phoE2x2Full5x5_          .push_back(lazyToolnoZS.e2x2(*((*iPho).superCluster()->seed())));
     phoE5x5Full5x5_          .push_back(iPho->full5x5_e5x5());
     phoR9Full5x5_            .push_back(iPho->full5x5_r9());    
-    phoPFChIso_         .push_back(iPho->chargedHadronIso()); 
-    phoPFChPVIso_       .push_back(iPho->chargedHadronPFPVIso()); 
+    phoPFChIso_         .push_back(iPho->chargedHadronIso()); //charged hadron isolation with dxy,dz match to pv
+    phoPFChPVIso_       .push_back(iPho->chargedHadronPFPVIso()); //only considers particles assigned to the primary vertex (PV) by particle flow, corresponds to <10_6 chargedHadronIso
     phoPFPhoIso_        .push_back(iPho->photonIso());
     phoPFNeuIso_        .push_back(iPho->neutralHadronIso());
-    phoPFChWorstIso_    .push_back(iPho->chargedHadronWorstVtxIso()); 
-    phoPFChWorstVetoIso_.push_back(iPho->chargedHadronWorstVtxGeomVetoIso());
+    phoPFChWorstIso_    .push_back(iPho->chargedHadronWorstVtxIso()); //max charged hadron isolation when dxy/dz matching to given vtx
+    phoPFChWorstVetoIso_.push_back(iPho->chargedHadronWorstVtxGeomVetoIso()); //as chargedHadronWorstVtxIso but an additional geometry based veto cone
     phoEcalPFClusterIso_.push_back(iPho->ecalPFClusterIso());
     phoHcalPFClusterIso_.push_back(iPho->hcalPFClusterIso());
 
