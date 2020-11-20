@@ -22,6 +22,11 @@
 #include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 
+#include "DataFormats/HLTReco/interface/TriggerEvent.h"
+#include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
+#include "DataFormats/Common/interface/TriggerResults.h"
+//#include "HLTrigger/HLTcore/interface/HLTPrescaleProvider.h"
+
 #include "DataFormats/Math/interface/deltaR.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
@@ -83,12 +88,14 @@ private:
   void analyze(const edm::Event&, const edm::EventSetup&); // override;
   //Void- Endjob() override;
 
+  void branchesGlobalEvent(TTree*);
   void branchesGenInfo    (TTree*, edm::Service<TFileService>&);
   void branchesGenPart    (TTree*);
   void branchesPhotons    (TTree*);
   void branchesElectrons  (TTree*);
   void branchesRechits    (TTree*);
 
+  void fillGlobalEvent(const edm::Event&, const edm::EventSetup&);
   void fillGenInfo    (const edm::Event&);
   void fillGenPart    (const edm::Event&);
   void fillPhotons    (const edm::Event&, const edm::EventSetup&);
@@ -105,6 +112,15 @@ private:
   edm::EDGetTokenT<LHEEventProduct>                lheEventLabel_;
   edm::EDGetTokenT<vector<PileupSummaryInfo> >     puCollection_;
   edm::EDGetTokenT<vector<reco::GenParticle> >     genParticlesCollection_;
+
+  edm::EDGetTokenT<double>                         rhoLabel_;
+  edm::EDGetTokenT<double>                         rhoCentralLabel_;
+  edm::EDGetTokenT<trigger::TriggerEvent>          trgEventLabel_;
+  edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection> triggerObjectsLabel_;
+  edm::EDGetTokenT<edm::TriggerResults>            trgResultsLabel_;
+  string                                           trgResultsProcess_;
+  edm::EDGetTokenT<edm::TriggerResults>            patTrgResultsLabel_;
+  //HLTPrescaleProvider                              hltPrescaleProvider_;
 
   edm::EDGetTokenT<edm::View<pat::Electron> >      electronCollection_;
   edm::EDGetTokenT<edm::View<pat::Photon> >        photonCollection_;

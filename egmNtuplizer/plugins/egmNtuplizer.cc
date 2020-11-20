@@ -27,7 +27,9 @@ void setbit(UShort_t& x, UShort_t bit) {
 }
 
 egmNtuplizer::egmNtuplizer(const edm::ParameterSet& iConfig) 
+//egmNtuplizer::egmNtuplizer(const edm::ParameterSet& iConfig) :
   //electronCollection_(consumes<edm::View<reco::GsfElectron> >(iConfig.getParameter<edm::InputTag>("electrons")))
+  //hltPrescaleProvider_(iConfig, consumesCollector(), *this)
 {
 #ifdef THIS_IS_AN_EVENTSETUP_EXAMPLE
   setupDataToken_ = esConsumes<SetupData, SetupRecord>();
@@ -47,6 +49,14 @@ egmNtuplizer::egmNtuplizer(const edm::ParameterSet& iConfig)
   puCollection_              = consumes<vector<PileupSummaryInfo> >    (iConfig.getParameter<InputTag>("pileupCollection"));
   genParticlesCollection_    = consumes<vector<reco::GenParticle> >    (iConfig.getParameter<InputTag>("genParticleSrc"));
 
+  rhoLabel_                  = consumes<double>                        (iConfig.getParameter<InputTag>("rhoLabel"));
+  rhoCentralLabel_           = consumes<double>                        (iConfig.getParameter<InputTag>("rhoCentralLabel"));
+  //trgEventLabel_             = consumes<trigger::TriggerEvent>         (iConfig.getParameter<InputTag>("triggerEvent"));
+  //triggerObjectsLabel_       = consumes<pat::TriggerObjectStandAloneCollection>(iConfig.getParameter<edm::InputTag>("triggerEvent"));
+  trgResultsLabel_           = consumes<edm::TriggerResults>           (iConfig.getParameter<InputTag>("triggerResults"));
+  //patTrgResultsLabel_        = consumes<edm::TriggerResults>           (iConfig.getParameter<InputTag>("patTriggerResults"));
+  trgResultsProcess_         =                                          iConfig.getParameter<InputTag>("triggerResults").process();
+
   electronCollection_         = consumes<View<pat::Electron> > (iConfig.getParameter<InputTag>("electronSrc"));
   photonCollection_           = consumes<View<pat::Photon> >   (iConfig.getParameter<InputTag>("photonSrc"));
   ebReducedRecHitCollection_  = consumes<EcalRecHitCollection> (iConfig.getParameter<InputTag>("ebReducedRecHitCollection"));
@@ -56,6 +66,7 @@ egmNtuplizer::egmNtuplizer(const edm::ParameterSet& iConfig)
   edm::Service<TFileService> fs;
   tree = fs->make<TTree>("EventTree", "EventInfo");
 
+  branchesGlobalEvent(tree);
   if (doGenParticles_) {
     branchesGenInfo(tree, fs);
     branchesGenPart(tree);
@@ -87,6 +98,7 @@ void egmNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     // int charge = track.charge();
   //AR }
 
+  fillGlobalEvent(iEvent, iSetup);
   if (!iEvent.isRealData()) {
     fillGenInfo(iEvent);
     if (doGenParticles_)

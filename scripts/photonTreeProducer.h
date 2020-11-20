@@ -1,10 +1,3 @@
-//////////////////////////////////////////////////////////
-// This class has been automatically generated on
-// Fri Sep 18 12:55:41 2020 by ROOT version 6.16/00
-// from TTree EventTree/EventInfo
-// found on file: egmTree.root
-//////////////////////////////////////////////////////////
-
 #ifndef photonTreeProducer_h
 #define photonTreeProducer_h
 
@@ -28,6 +21,19 @@ public :
 // Fixed size dimensions of array or collections stored in the TTree if any.
 
    // Declaration of leaf types
+   Int_t           run;
+   Long64_t        event;
+   Int_t           lumis;
+   Bool_t          isData;
+   Int_t           nVtx;
+   Int_t           nGoodVtx;
+   Int_t           nTrksPV;
+   Bool_t          isPVGood;
+   Float_t         vtx;
+   Float_t         vty;
+   Float_t         vtz;
+   Float_t         rho;
+   Float_t         rhoCentral;
    vector<float>   *pdf;
    Float_t         pthat;
    Float_t         processID;
@@ -185,6 +191,19 @@ public :
    vector<float>   *esRechitZ;
 
    // List of branches
+   TBranch        *b_run;   //!                                                                                                                  
+   TBranch        *b_event;   //!                                                                                                                
+   TBranch        *b_lumis;   //!                                                                                                                
+   TBranch        *b_isData;   //!                                                                                                               
+   TBranch        *b_nVtx;   //!                                                                                                                 
+   TBranch        *b_nGoodVtx;   //!                                                                                                             
+   TBranch        *b_nTrksPV;   //!                                                                                                              
+   TBranch        *b_isPVGood;   //!                                                                                                             
+   TBranch        *b_vtx;   //!                                                                                                                  
+   TBranch        *b_vty;   //!                                                                                                                  
+   TBranch        *b_vtz;   //!                                                                                                                  
+   TBranch        *b_rho;   //!                                                                                                                   
+   TBranch        *b_rhoCentral;   //!
    TBranch        *b_pdf;   //!
    TBranch        *b_pthat;   //!
    TBranch        *b_processID;   //!
@@ -572,6 +591,19 @@ void photonTreeProducer::Init(TTree *tree)
    fCurrent = -1;
    fChain->SetMakeClass(1);
 
+   fChain->SetBranchAddress("run", &run, &b_run);
+   fChain->SetBranchAddress("event", &event, &b_event);
+   fChain->SetBranchAddress("lumis", &lumis, &b_lumis);
+   fChain->SetBranchAddress("isData", &isData, &b_isData);
+   fChain->SetBranchAddress("nVtx", &nVtx, &b_nVtx);
+   fChain->SetBranchAddress("nGoodVtx", &nGoodVtx, &b_nGoodVtx);
+   fChain->SetBranchAddress("nTrksPV", &nTrksPV, &b_nTrksPV);
+   fChain->SetBranchAddress("isPVGood", &isPVGood, &b_isPVGood);
+   fChain->SetBranchAddress("vtx", &vtx, &b_vtx);
+   fChain->SetBranchAddress("vty", &vty, &b_vty);
+   fChain->SetBranchAddress("vtz", &vtz, &b_vtz);
+   fChain->SetBranchAddress("rho", &rho, &b_rho);
+   fChain->SetBranchAddress("rhoCentral", &rhoCentral, &b_rhoCentral);
    fChain->SetBranchAddress("pdf", &pdf, &b_pdf);
    fChain->SetBranchAddress("pthat", &pthat, &b_pthat);
    fChain->SetBranchAddress("processID", &processID, &b_processID);

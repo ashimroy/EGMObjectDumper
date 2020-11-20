@@ -53,6 +53,13 @@ process.egmNtuplizer = cms.EDAnalyzer('egmNtuplizer',
 
                                       VtxLabel             = cms.InputTag("offlineSlimmedPrimaryVertices"),
 #                                      VtxBSLabel           = cms.InputTag("offlinePrimaryVerticesWithBS"),
+                                      rhoLabel             = cms.InputTag("fixedGridRhoFastjetAll"),
+                                      rhoCentralLabel      = cms.InputTag("fixedGridRhoFastjetCentralNeutral"),
+                                      triggerEvent         = cms.InputTag("slimmedPatTrigger", "", ""),
+                                      triggerResults       = cms.InputTag("TriggerResults", "", "HLT"),
+                                      #patTriggerResults    = cms.InputTag("TriggerResults", "", "PAT"),
+                                      patTriggerResults    = cms.InputTag("TriggerResults", "", "RECO"),
+
                                       genParticleSrc       = cms.InputTag("prunedGenParticles"),
                                       generatorLabel       = cms.InputTag("generator"),
                                       LHEEventLabel        = cms.InputTag("externalLHEProducer"),

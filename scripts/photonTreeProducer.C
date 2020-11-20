@@ -15,29 +15,6 @@ bool debug = false;
 
 void photonTreeProducer::Loop(string outputfile, int ntotEvent, int nPrintEvent, float eventWeight)
 {
-//   In a ROOT session, you can do:
-//      root> .L photonTreeProducer.C
-//      root> photonTreeProducer t
-//      root> t.GetEntry(12); // Fill t data members with entry number 12
-//      root> t.Show();       // Show values of entry 12
-//      root> t.Show(16);     // Read and show values of entry 16
-//      root> t.Loop();       // Loop on all entries
-//
-
-//     This is the loop skeleton where:
-//    jentry is the global entry number in the chain
-//    ientry is the entry number in the current Tree
-//  Note that the argument to GetEntry must be:
-//    jentry for TChain::GetEntry
-//    ientry for TTree::GetEntry and TBranch::GetEntry
-//
-//       To read only selected branches, Insert statements like:
-// METHOD1:
-//    fChain->SetBranchStatus("*",0);  // disable all branches
-//    fChain->SetBranchStatus("branchname",1);  // activate branchname
-// METHOD2: replace line
-//    fChain->GetEntry(jentry);       //read all branches
-//by  b_branchname->GetEntry(ientry); //read only this branch
 
   TStopwatch sw;
    sw.Start();
@@ -57,8 +34,17 @@ void photonTreeProducer::Loop(string outputfile, int ntotEvent, int nPrintEvent,
    if (ntotEvent >= 0) nentries = ntotEvent; // number of events you want to process..
    std::cout << "Running on Total entries: " << nentries << std::endl;
 
-   bool   isTruePho_;
+
+
    float  evtWeightXS_;
+   int    evt_nVtx_;
+   int    evt_nGoodVtx_;
+   float  evt_vtx_;
+   float  evt_vty_;
+   float  evt_vtz_;
+   float  evt_rho_;
+
+   bool   isTruePho_;
    float  pho_genPt_;
    float  pho_E_;
    float  pho_Pt_;
@@ -76,6 +62,7 @@ void photonTreeProducer::Loop(string outputfile, int ntotEvent, int nPrintEvent,
    int    pho_EleVeto_;
    float  pho_R9_;
    float  pho_HoverE_;
+   float  pho_ESEffSigmaRR_;
    float  pho_SigmaIEtaIEtaFull5x5_;
    float  pho_SigmaIEtaIPhiFull5x5_;
    float  pho_SigmaIPhiIPhiFull5x5_;
@@ -99,7 +86,20 @@ void photonTreeProducer::Loop(string outputfile, int ntotEvent, int nPrintEvent,
    vector<float> pho_EnergyMatrix9x9_;
    vector<float> pho_EnergyMatrix11x11_;
    vector<float> pho_EnergyMatrix15x15_;
+   float  mc_Pt_;
+   float  mc_PID_;
+   float  mc_MomPID_;
 
+   tree->Branch("evt_nVtx",                   &evt_nVtx_);
+   tree->Branch("evt_nGoodVtx",               &evt_nGoodVtx_);
+   tree->Branch("evt_vtx",                    &evt_vtx_);
+   tree->Branch("evt_vty",                    &evt_vty_);
+   tree->Branch("evt_vtz",                    &evt_vtz_);
+   tree->Branch("evt_rho",                    &evt_rho_);
+
+   tree->Branch("mc_Pt",                    &mc_Pt_);
+   tree->Branch("mc_PID",                   &mc_PID_);
+   tree->Branch("mc_MomPID",                &mc_MomPID_);
    tree->Branch("isTruePho",                &isTruePho_);
    tree->Branch("evtWeightXS",              &evtWeightXS_);
    tree->Branch("pho_genPt",                &pho_genPt_);
@@ -119,6 +119,7 @@ void photonTreeProducer::Loop(string outputfile, int ntotEvent, int nPrintEvent,
    tree->Branch("pho_EleVeto",              &pho_EleVeto_);
    tree->Branch("pho_R9",                   &pho_R9_);
    tree->Branch("pho_HoverE",               &pho_HoverE_);
+   tree->Branch("pho_ESEffSigmaRR",         &pho_ESEffSigmaRR_);
    tree->Branch("pho_SigmaIEtaIEtaFull5x5", &pho_SigmaIEtaIEtaFull5x5_);
    tree->Branch("pho_SigmaIEtaIPhiFull5x5", &pho_SigmaIEtaIPhiFull5x5_);
    tree->Branch("pho_SigmaIPhiIPhiFull5x5", &pho_SigmaIPhiIPhiFull5x5_);
@@ -133,17 +134,25 @@ void photonTreeProducer::Loop(string outputfile, int ntotEvent, int nPrintEvent,
    tree->Branch("pho_PFChWorstVetoIso",     &pho_PFChWorstVetoIso_);
    tree->Branch("pho_EcalPFClusterIso",     &pho_EcalPFClusterIso_);
    tree->Branch("pho_HcalPFClusterIso",     &pho_HcalPFClusterIso_);
-   tree->Branch("pho_SeedTime",             &pho_SeedTime_);
-   tree->Branch("pho_SeedEnergy",           &pho_SeedEnergy_);
-   tree->Branch("pho_SeediEta",             &pho_SeediEta_);
-   tree->Branch("pho_SeediPhi",             &pho_SeediPhi_);
+   //tree->Branch("pho_SeedTime",             &pho_SeedTime_);
+   //tree->Branch("pho_SeedEnergy",           &pho_SeedEnergy_);
+   //tree->Branch("pho_SeediEta",             &pho_SeediEta_);
+   //tree->Branch("pho_SeediPhi",             &pho_SeediPhi_);
    tree->Branch("pho_EnergyMatrix5x5",      &pho_EnergyMatrix5x5_);
-   tree->Branch("pho_EnergyMatrix7x7",      &pho_EnergyMatrix7x7_);
+   //tree->Branch("pho_EnergyMatrix7x7",      &pho_EnergyMatrix7x7_);
    tree->Branch("pho_EnergyMatrix9x9",      &pho_EnergyMatrix9x9_);
    tree->Branch("pho_EnergyMatrix11x11",    &pho_EnergyMatrix11x11_);
    tree->Branch("pho_EnergyMatrix15x15",    &pho_EnergyMatrix15x15_);
 
-   
+   tree_sig->Branch("evt_nVtx",                   &evt_nVtx_);
+   tree_sig->Branch("evt_nGoodVtx",               &evt_nGoodVtx_);
+   tree_sig->Branch("evt_vtx",                    &evt_vtx_);
+   tree_sig->Branch("evt_vty",                    &evt_vty_);
+   tree_sig->Branch("evt_vtz",                    &evt_vtz_);
+   tree_sig->Branch("evt_rho",                    &evt_rho_);   
+   tree_sig->Branch("mc_Pt",                    &mc_Pt_);
+   tree_sig->Branch("mc_PID",                   &mc_PID_);
+   tree_sig->Branch("mc_MomPID",                &mc_MomPID_);
    tree_sig->Branch("isTruePho",                &isTruePho_);
    tree_sig->Branch("evtWeightXS",              &evtWeightXS_);
    tree_sig->Branch("pho_genPt",                &pho_genPt_);
@@ -163,6 +172,7 @@ void photonTreeProducer::Loop(string outputfile, int ntotEvent, int nPrintEvent,
    tree_sig->Branch("pho_EleVeto",              &pho_EleVeto_);
    tree_sig->Branch("pho_R9",                   &pho_R9_);
    tree_sig->Branch("pho_HoverE",               &pho_HoverE_);
+   tree_sig->Branch("pho_ESEffSigmaRR",         &pho_ESEffSigmaRR_);
    tree_sig->Branch("pho_SigmaIEtaIEtaFull5x5", &pho_SigmaIEtaIEtaFull5x5_);
    tree_sig->Branch("pho_SigmaIEtaIPhiFull5x5", &pho_SigmaIEtaIPhiFull5x5_);
    tree_sig->Branch("pho_SigmaIPhiIPhiFull5x5", &pho_SigmaIPhiIPhiFull5x5_);
@@ -177,16 +187,25 @@ void photonTreeProducer::Loop(string outputfile, int ntotEvent, int nPrintEvent,
    tree_sig->Branch("pho_PFChWorstVetoIso",     &pho_PFChWorstVetoIso_);
    tree_sig->Branch("pho_EcalPFClusterIso",     &pho_EcalPFClusterIso_);
    tree_sig->Branch("pho_HcalPFClusterIso",     &pho_HcalPFClusterIso_);
-   tree_sig->Branch("pho_SeedTime",             &pho_SeedTime_);
-   tree_sig->Branch("pho_SeedEnergy",           &pho_SeedEnergy_);
-   tree_sig->Branch("pho_SeediEta",             &pho_SeediEta_);
-   tree_sig->Branch("pho_SeediPhi",             &pho_SeediPhi_);
+   //tree_sig->Branch("pho_SeedTime",             &pho_SeedTime_);
+   //tree_sig->Branch("pho_SeedEnergy",           &pho_SeedEnergy_);
+   //tree_sig->Branch("pho_SeediEta",             &pho_SeediEta_);
+   //tree_sig->Branch("pho_SeediPhi",             &pho_SeediPhi_);
    tree_sig->Branch("pho_EnergyMatrix5x5",      &pho_EnergyMatrix5x5_);
-   tree_sig->Branch("pho_EnergyMatrix7x7",      &pho_EnergyMatrix7x7_);
+   //tree_sig->Branch("pho_EnergyMatrix7x7",      &pho_EnergyMatrix7x7_);
    tree_sig->Branch("pho_EnergyMatrix9x9",      &pho_EnergyMatrix9x9_);
    tree_sig->Branch("pho_EnergyMatrix11x11",    &pho_EnergyMatrix11x11_);
    tree_sig->Branch("pho_EnergyMatrix15x15",    &pho_EnergyMatrix15x15_);
 
+   tree_bkg->Branch("evt_nVtx",                   &evt_nVtx_);
+   tree_bkg->Branch("evt_nGoodVtx",               &evt_nGoodVtx_);
+   tree_bkg->Branch("evt_vtx",                    &evt_vtx_);
+   tree_bkg->Branch("evt_vty",                    &evt_vty_);
+   tree_bkg->Branch("evt_vtz",                    &evt_vtz_);
+   tree_bkg->Branch("evt_rho",                    &evt_rho_);
+   tree_bkg->Branch("mc_Pt",                    &mc_Pt_);
+   tree_bkg->Branch("mc_PID",                   &mc_PID_);
+   tree_bkg->Branch("mc_MomPID",                &mc_MomPID_);
    tree_bkg->Branch("isTruePho",                &isTruePho_);
    tree_bkg->Branch("evtWeightXS",              &evtWeightXS_);
    tree_bkg->Branch("pho_genPt",                &pho_genPt_);
@@ -206,6 +225,7 @@ void photonTreeProducer::Loop(string outputfile, int ntotEvent, int nPrintEvent,
    tree_bkg->Branch("pho_EleVeto",              &pho_EleVeto_);
    tree_bkg->Branch("pho_R9",                   &pho_R9_);
    tree_bkg->Branch("pho_HoverE",               &pho_HoverE_);
+   tree_bkg->Branch("pho_ESEffSigmaRR",         &pho_ESEffSigmaRR_);
    tree_bkg->Branch("pho_SigmaIEtaIEtaFull5x5", &pho_SigmaIEtaIEtaFull5x5_);
    tree_bkg->Branch("pho_SigmaIEtaIPhiFull5x5", &pho_SigmaIEtaIPhiFull5x5_);
    tree_bkg->Branch("pho_SigmaIPhiIPhiFull5x5", &pho_SigmaIPhiIPhiFull5x5_);
@@ -220,12 +240,12 @@ void photonTreeProducer::Loop(string outputfile, int ntotEvent, int nPrintEvent,
    tree_bkg->Branch("pho_PFChWorstVetoIso",     &pho_PFChWorstVetoIso_);
    tree_bkg->Branch("pho_EcalPFClusterIso",     &pho_EcalPFClusterIso_);
    tree_bkg->Branch("pho_HcalPFClusterIso",     &pho_HcalPFClusterIso_);
-   tree_bkg->Branch("pho_SeedTime",             &pho_SeedTime_);
-   tree_bkg->Branch("pho_SeedEnergy",           &pho_SeedEnergy_);
-   tree_bkg->Branch("pho_SeediEta",             &pho_SeediEta_);
-   tree_bkg->Branch("pho_SeediPhi",             &pho_SeediPhi_);
+   //tree_bkg->Branch("pho_SeedTime",             &pho_SeedTime_);
+   //tree_bkg->Branch("pho_SeedEnergy",           &pho_SeedEnergy_);
+   //tree_bkg->Branch("pho_SeediEta",             &pho_SeediEta_);
+   //tree_bkg->Branch("pho_SeediPhi",             &pho_SeediPhi_);
    tree_bkg->Branch("pho_EnergyMatrix5x5",      &pho_EnergyMatrix5x5_);
-   tree_bkg->Branch("pho_EnergyMatrix7x7",      &pho_EnergyMatrix7x7_);
+   //tree_bkg->Branch("pho_EnergyMatrix7x7",      &pho_EnergyMatrix7x7_);
    tree_bkg->Branch("pho_EnergyMatrix9x9",      &pho_EnergyMatrix9x9_);
    tree_bkg->Branch("pho_EnergyMatrix11x11",    &pho_EnergyMatrix11x11_);
    tree_bkg->Branch("pho_EnergyMatrix15x15",    &pho_EnergyMatrix15x15_);
@@ -240,7 +260,13 @@ void photonTreeProducer::Loop(string outputfile, int ntotEvent, int nPrintEvent,
       if (jentry % nPrintEvent == 0) std::cout << "  " << jentry  << "  Events Processed... " << std::endl;
 
       evtWeightXS_ = eventWeight;
-      
+      evt_nVtx_ = nVtx;
+      evt_nGoodVtx_ = nGoodVtx;      
+      evt_vtx_ = vtx;
+      evt_vty_ = vty;
+      evt_vtz_ = vtz;
+      evt_rho_ = rho;
+
       if (nPho == 0) continue;
       for (int ipho=0; ipho<nPho; ipho++){
 
@@ -269,6 +295,7 @@ void photonTreeProducer::Loop(string outputfile, int ntotEvent, int nPrintEvent,
 	pho_EleVeto_ = (*phoEleVeto)[ipho];
 	pho_R9_ = (*phoR9)[ipho];
 	pho_HoverE_ = (*phoHoverE)[ipho];
+	pho_ESEffSigmaRR_ = (*phoESEffSigmaRR)[ipho];
 	pho_SigmaIEtaIEtaFull5x5_ = (*phoSigmaIEtaIEtaFull5x5)[ipho];
 	pho_SigmaIEtaIPhiFull5x5_ = (*phoSigmaIEtaIPhiFull5x5)[ipho];
 	pho_SigmaIPhiIPhiFull5x5_ = (*phoSigmaIPhiIPhiFull5x5)[ipho];
@@ -293,6 +320,10 @@ void photonTreeProducer::Loop(string outputfile, int ntotEvent, int nPrintEvent,
 	pho_EnergyMatrix9x9_    = phoEnergyMatrix9x9->at(ipho); 
 	pho_EnergyMatrix11x11_  = phoEnergyMatrix11x11->at(ipho);
 	pho_EnergyMatrix15x15_  = phoEnergyMatrix15x15->at(ipho);
+
+	mc_Pt_       = (*mcPt)[0]; 
+	mc_PID_      = (*mcPID)[0]; 
+	mc_MomPID_   = (*mcMomPID)[0]; 
 	
 	int pass = 0;
 	bool isPhoPrompt = false; 
@@ -313,7 +344,7 @@ void photonTreeProducer::Loop(string outputfile, int ntotEvent, int nPrintEvent,
 	  double DR = mcPhoton.DrEtaPhi(recoPhoton);
 	  double dp = fabs((*mcPt)[imc] - (*phoEt)[ipho] )/(*mcPt)[imc];
 	  if (debug) cout << "DR: " << DR << "    dp: " << dp << endl;
-	  if(DR < 0.2 && dp < 0.1  ){
+	  if(DR < 0.2 && dp < 0.2  ){
 	    if (debug) cout<< "pass : DR < 0.2 && dp < 0.1 " << endl;
 	    pass++;
 	    if (pass!=1) cout<< "*************************** Warning **************************   pass value: " << pass << endl;
