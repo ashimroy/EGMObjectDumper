@@ -14,6 +14,7 @@
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Utilities/interface/InputTag.h"
+#include "FWCore/Utilities/interface/EDGetToken.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
 
@@ -42,6 +43,7 @@
 #include "DataFormats/GeometryVector/interface/GlobalPoint.h"
 #include "DataFormats/EcalRecHit/interface/EcalRecHit.h"           
 #include "DataFormats/EcalRecHit/interface/EcalRecHitCollections.h"
+#include "RecoEcal/EgammaCoreTools/interface/EcalClusterLazyTools.h"
 
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
@@ -129,6 +131,7 @@ private:
   edm::EDGetTokenT<EcalRecHitCollection>           ebReducedRecHitCollection_;
   edm::EDGetTokenT<EcalRecHitCollection>           eeReducedRecHitCollection_;
   edm::EDGetTokenT<EcalRecHitCollection>           esReducedRecHitCollection_;
+  const EcalClusterLazyTools::ESGetTokens          ecalClusterESGetTokens_; 
 
 #ifdef THIS_IS_AN_EVENTSETUP_EXAMPLE
   edm::ESGetToken<SetupData, SetupRecord> setupToken_;

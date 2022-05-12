@@ -60,6 +60,7 @@ vector<vector<float>> eleEnergyMatrix7x7_;
 vector<vector<float>> eleEnergyMatrix9x9_;
 vector<vector<float>> eleEnergyMatrix11x11_;
 vector<vector<float>> eleEnergyMatrix15x15_;
+vector<vector<float>> eleEnergyMatrix25x25_;
 
 
 void egmNtuplizer::branchesElectrons(TTree* tree) {
@@ -104,7 +105,7 @@ void egmNtuplizer::branchesElectrons(TTree* tree) {
   tree->Branch("eleEnergyMatrix9x9",     &eleEnergyMatrix9x9_);
   tree->Branch("eleEnergyMatrix11x11",     &eleEnergyMatrix11x11_);
   tree->Branch("eleEnergyMatrix15x15",     &eleEnergyMatrix15x15_);
-
+  tree->Branch("eleEnergyMatrix25x25",     &eleEnergyMatrix25x25_);
 }
 
 //
@@ -166,6 +167,7 @@ void egmNtuplizer::fillElectrons(const edm::Event &iEvent, const edm::EventSetup
   eleEnergyMatrix9x9_         .clear();
   eleEnergyMatrix11x11_       .clear(); 
   eleEnergyMatrix15x15_       .clear(); 
+  eleEnergyMatrix25x25_       .clear(); 
   nEle_=0;
 
   //////////////////////////////Filling of Variables///////////////////////////////////
@@ -175,8 +177,8 @@ void egmNtuplizer::fillElectrons(const edm::Event &iEvent, const edm::EventSetup
   //edm::Handle<pat::PackedCandidateCollection> pfcands;
   //iEvent.getByToken(pckPFCandidateCollection_, pfcands);
 
-  EcalClusterLazyTools       lazyTool    (iEvent, iSetup, ebReducedRecHitCollection_, eeReducedRecHitCollection_, esReducedRecHitCollection_);
-  noZS::EcalClusterLazyTools lazyToolnoZS(iEvent, iSetup, ebReducedRecHitCollection_, eeReducedRecHitCollection_, esReducedRecHitCollection_);
+  EcalClusterLazyTools       lazyTool    (iEvent, ecalClusterESGetTokens_.get(iSetup), ebReducedRecHitCollection_, eeReducedRecHitCollection_, esReducedRecHitCollection_);
+  noZS::EcalClusterLazyTools lazyToolnoZS(iEvent, ecalClusterESGetTokens_.get(iSetup), ebReducedRecHitCollection_, eeReducedRecHitCollection_, esReducedRecHitCollection_);
 
   if (!electronHandle.isValid()) {
     edm::LogWarning("ggNtuplizer") << "no pat::Electrons in event";
@@ -229,6 +231,7 @@ void egmNtuplizer::fillElectrons(const edm::Event &iEvent, const edm::EventSetup
     eleEnergyMatrix9x9_.push_back(lazyToolnoZS.energyMatrix(seedSC,4));
     eleEnergyMatrix11x11_.push_back(lazyToolnoZS.energyMatrix(seedSC,5));
     eleEnergyMatrix15x15_.push_back(lazyToolnoZS.energyMatrix(seedSC,7));
+    eleEnergyMatrix25x25_.push_back(lazyToolnoZS.energyMatrix(seedSC,12));
 
     nEle_++;
   }

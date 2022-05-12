@@ -86,6 +86,7 @@ void photonTreeProducer::Loop(string outputfile, int ntotEvent, int nPrintEvent,
    vector<float> pho_EnergyMatrix9x9_;
    vector<float> pho_EnergyMatrix11x11_;
    vector<float> pho_EnergyMatrix15x15_;
+   vector<float> pho_EnergyMatrix25x25_;
    float  mc_Pt_;
    float  mc_PID_;
    float  mc_MomPID_;
@@ -143,6 +144,7 @@ void photonTreeProducer::Loop(string outputfile, int ntotEvent, int nPrintEvent,
    tree->Branch("pho_EnergyMatrix9x9",      &pho_EnergyMatrix9x9_);
    tree->Branch("pho_EnergyMatrix11x11",    &pho_EnergyMatrix11x11_);
    tree->Branch("pho_EnergyMatrix15x15",    &pho_EnergyMatrix15x15_);
+   tree->Branch("pho_EnergyMatrix25x25",    &pho_EnergyMatrix25x25_);
 
    tree_sig->Branch("evt_nVtx",                   &evt_nVtx_);
    tree_sig->Branch("evt_nGoodVtx",               &evt_nGoodVtx_);
@@ -196,6 +198,7 @@ void photonTreeProducer::Loop(string outputfile, int ntotEvent, int nPrintEvent,
    tree_sig->Branch("pho_EnergyMatrix9x9",      &pho_EnergyMatrix9x9_);
    tree_sig->Branch("pho_EnergyMatrix11x11",    &pho_EnergyMatrix11x11_);
    tree_sig->Branch("pho_EnergyMatrix15x15",    &pho_EnergyMatrix15x15_);
+   tree_sig->Branch("pho_EnergyMatrix25x25",    &pho_EnergyMatrix25x25_);
 
    tree_bkg->Branch("evt_nVtx",                   &evt_nVtx_);
    tree_bkg->Branch("evt_nGoodVtx",               &evt_nGoodVtx_);
@@ -249,6 +252,7 @@ void photonTreeProducer::Loop(string outputfile, int ntotEvent, int nPrintEvent,
    tree_bkg->Branch("pho_EnergyMatrix9x9",      &pho_EnergyMatrix9x9_);
    tree_bkg->Branch("pho_EnergyMatrix11x11",    &pho_EnergyMatrix11x11_);
    tree_bkg->Branch("pho_EnergyMatrix15x15",    &pho_EnergyMatrix15x15_);
+   tree_bkg->Branch("pho_EnergyMatrix25x25",    &pho_EnergyMatrix25x25_);
    
    Long64_t nbytes = 0, nb = 0;
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
@@ -278,6 +282,7 @@ void photonTreeProducer::Loop(string outputfile, int ntotEvent, int nPrintEvent,
 	pho_EnergyMatrix9x9_.clear();
 	pho_EnergyMatrix11x11_.clear();
 	pho_EnergyMatrix15x15_.clear();
+	pho_EnergyMatrix25x25_.clear();
 
 	pho_E_ = (*phoE)[ipho];
 	pho_Pt_ = (*phoEt)[ipho];
@@ -320,6 +325,7 @@ void photonTreeProducer::Loop(string outputfile, int ntotEvent, int nPrintEvent,
 	pho_EnergyMatrix9x9_    = phoEnergyMatrix9x9->at(ipho); 
 	pho_EnergyMatrix11x11_  = phoEnergyMatrix11x11->at(ipho);
 	pho_EnergyMatrix15x15_  = phoEnergyMatrix15x15->at(ipho);
+	pho_EnergyMatrix25x25_  = phoEnergyMatrix25x25->at(ipho);
 
 	mc_Pt_       = (*mcPt)[0]; 
 	mc_PID_      = (*mcPID)[0]; 

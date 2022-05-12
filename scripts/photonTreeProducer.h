@@ -119,6 +119,7 @@ public :
    vector<vector<float> > *phoEnergyMatrix9x9;
    vector<vector<float> > *phoEnergyMatrix11x11;
    vector<vector<float> > *phoEnergyMatrix15x15;
+   vector<vector<float> > *phoEnergyMatrix25x25;
    Int_t           nEle;
    vector<int>     *eleCharge;
    vector<int>     *eleChargeConsistent;
@@ -155,6 +156,7 @@ public :
    vector<vector<float> > *eleEnergyMatrix9x9;
    vector<vector<float> > *eleEnergyMatrix11x11;
    vector<vector<float> > *eleEnergyMatrix15x15;
+   vector<vector<float> > *eleEnergyMatrix25x25;
    Int_t           nebRechit;
    vector<float>   *ebRechitE;
    vector<int>     *ebRechitiEta;
@@ -289,6 +291,7 @@ public :
    TBranch        *b_phoEnergyMatrix9x9;   //!
    TBranch        *b_phoEnergyMatrix11x11;   //!
    TBranch        *b_phoEnergyMatrix15x15;   //!
+   TBranch        *b_phoEnergyMatrix25x25;   //!
    TBranch        *b_nEle;   //!
    TBranch        *b_eleCharge;   //!
    TBranch        *b_eleChargeConsistent;   //!
@@ -325,6 +328,7 @@ public :
    TBranch        *b_eleEnergyMatrix9x9;   //!
    TBranch        *b_eleEnergyMatrix11x11;   //!
    TBranch        *b_eleEnergyMatrix15x15;   //!
+   TBranch        *b_eleEnergyMatrix25x25;   //!
    TBranch        *b_nebRechit;   //!
    TBranch        *b_ebRechitE;   //!
    TBranch        *b_ebRechitiEta;   //!
@@ -519,6 +523,7 @@ void photonTreeProducer::Init(TTree *tree)
    phoEnergyMatrix9x9 = 0;
    phoEnergyMatrix11x11 = 0;
    phoEnergyMatrix15x15 = 0;
+   phoEnergyMatrix25x25 = 0;
    eleCharge = 0;
    eleChargeConsistent = 0;
    eleEn = 0;
@@ -554,6 +559,7 @@ void photonTreeProducer::Init(TTree *tree)
    eleEnergyMatrix9x9 = 0;
    eleEnergyMatrix11x11 = 0;
    eleEnergyMatrix15x15 = 0;
+   eleEnergyMatrix25x25 = 0;
    ebRechitE = 0;
    ebRechitiEta = 0;
    ebRechitiPhi = 0;
@@ -689,6 +695,7 @@ void photonTreeProducer::Init(TTree *tree)
    fChain->SetBranchAddress("phoEnergyMatrix9x9", &phoEnergyMatrix9x9, &b_phoEnergyMatrix9x9);
    fChain->SetBranchAddress("phoEnergyMatrix11x11", &phoEnergyMatrix11x11, &b_phoEnergyMatrix11x11);
    fChain->SetBranchAddress("phoEnergyMatrix15x15", &phoEnergyMatrix15x15, &b_phoEnergyMatrix15x15);
+   fChain->SetBranchAddress("phoEnergyMatrix25x25", &phoEnergyMatrix25x25, &b_phoEnergyMatrix25x25);
    fChain->SetBranchAddress("nEle", &nEle, &b_nEle);
    fChain->SetBranchAddress("eleCharge", &eleCharge, &b_eleCharge);
    fChain->SetBranchAddress("eleChargeConsistent", &eleChargeConsistent, &b_eleChargeConsistent);
@@ -725,6 +732,7 @@ void photonTreeProducer::Init(TTree *tree)
    fChain->SetBranchAddress("eleEnergyMatrix9x9", &eleEnergyMatrix9x9, &b_eleEnergyMatrix9x9);
    fChain->SetBranchAddress("eleEnergyMatrix11x11", &eleEnergyMatrix11x11, &b_eleEnergyMatrix11x11);
    fChain->SetBranchAddress("eleEnergyMatrix15x15", &eleEnergyMatrix15x15, &b_eleEnergyMatrix15x15);
+   fChain->SetBranchAddress("eleEnergyMatrix25x25", &eleEnergyMatrix25x25, &b_eleEnergyMatrix25x25);
    fChain->SetBranchAddress("nebRechit", &nebRechit, &b_nebRechit);
    fChain->SetBranchAddress("ebRechitE", &ebRechitE, &b_ebRechitE);
    fChain->SetBranchAddress("ebRechitiEta", &ebRechitiEta, &b_ebRechitiEta);

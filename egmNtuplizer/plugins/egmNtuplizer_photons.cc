@@ -61,6 +61,7 @@ vector<vector<float>> phoEnergyMatrix7x7_;
 vector<vector<float>> phoEnergyMatrix9x9_;
 vector<vector<float>> phoEnergyMatrix11x11_;
 vector<vector<float>> phoEnergyMatrix15x15_;
+vector<vector<float>> phoEnergyMatrix25x25_;
 
 //Necessary for the Photon Footprint removal
 template <class T, class U>
@@ -122,6 +123,7 @@ void egmNtuplizer::branchesPhotons(TTree* tree) {
   tree->Branch("phoEnergyMatrix9x9",     &phoEnergyMatrix9x9_);
   tree->Branch("phoEnergyMatrix11x11",     &phoEnergyMatrix11x11_);
   tree->Branch("phoEnergyMatrix15x15",     &phoEnergyMatrix15x15_);
+  tree->Branch("phoEnergyMatrix25x25",     &phoEnergyMatrix25x25_);
 
 }
 
@@ -177,19 +179,28 @@ void egmNtuplizer::fillPhotons(const edm::Event& iEvent, const edm::EventSetup& 
   phoEnergyMatrix9x9_     .clear();
   phoEnergyMatrix11x11_   .clear();
   phoEnergyMatrix15x15_   .clear();
+  phoEnergyMatrix25x25_   .clear();
   nPho_ = 0;
 
   //////////////////////////////Filling of Variables///////////////////////////////////
   edm::Handle<edm::View<pat::Photon> > photonHandle;
   iEvent.getByToken(photonCollection_, photonHandle);
 
+  // Get the RecHits from the event
+  Handle<EcalRecHitCollection> pRecHitsEB;
+  iEvent.getByToken(ebReducedRecHitCollection_, pRecHitsEB);
+
+  // Get the RecHits from the event
+  Handle<EcalRecHitCollection> pRecHitsEE;
+  iEvent.getByToken(eeReducedRecHitCollection_, pRecHitsEE);
+
   if (!photonHandle.isValid()) {
     edm::LogWarning("ggNtuplizer") << "no pat::Photons in event";
     return;
   }
 
-  EcalClusterLazyTools       lazyTool    (iEvent, iSetup, ebReducedRecHitCollection_, eeReducedRecHitCollection_, esReducedRecHitCollection_);
-  noZS::EcalClusterLazyTools lazyToolnoZS(iEvent, iSetup, ebReducedRecHitCollection_, eeReducedRecHitCollection_, esReducedRecHitCollection_);
+  EcalClusterLazyTools       lazyTool    (iEvent, ecalClusterESGetTokens_.get(iSetup), ebReducedRecHitCollection_, eeReducedRecHitCollection_, esReducedRecHitCollection_);
+  noZS::EcalClusterLazyTools lazyToolnoZS(iEvent, ecalClusterESGetTokens_.get(iSetup), ebReducedRecHitCollection_, eeReducedRecHitCollection_, esReducedRecHitCollection_);
 
   for (edm::View<pat::Photon>::const_iterator iPho = photonHandle->begin(); iPho != photonHandle->end(); ++iPho) {
     phoE_               .push_back(iPho->energy());
@@ -234,10 +245,10 @@ void egmNtuplizer::fillPhotons(const edm::Event& iEvent, const edm::EventSetup& 
     const auto &seedSC = *(iPho->superCluster()->seed());
     DetId seedDetId = (iPho->superCluster()->seed()->hitsAndFractions())[0].first;
     bool isBarrel = seedDetId.subdetId() == EcalBarrel;
-    const EcalRecHitCollection * rechits = (isBarrel?lazyTool.getEcalEBRecHitCollection():lazyTool.getEcalEERecHitCollection());
-            
-    EcalRecHitCollection::const_iterator theSeedHit = rechits->find(seedDetId);
-    if (theSeedHit != rechits->end()) {
+    
+    const EcalRecHitCollection& rechits = (isBarrel? *pRecHitsEB : *pRecHitsEE); 
+    EcalRecHitCollection::const_iterator theSeedHit = rechits.find(seedDetId);
+    if (theSeedHit != rechits.end()) {
       //std::cout<<"(*theSeedHit).time()"<<(*theSeedHit).time()<<"seed energy: "<<(*theSeedHit).energy()<<std::endl;  
 
       phoSeedTime_  .push_back((*theSeedHit).time());
@@ -265,6 +276,7 @@ void egmNtuplizer::fillPhotons(const edm::Event& iEvent, const edm::EventSetup& 
     phoEnergyMatrix9x9_.push_back(lazyToolnoZS.energyMatrix(seedSC,4));
     phoEnergyMatrix11x11_.push_back(lazyToolnoZS.energyMatrix(seedSC,5));
     phoEnergyMatrix15x15_.push_back(lazyToolnoZS.energyMatrix(seedSC,7));
+    phoEnergyMatrix25x25_.push_back(lazyToolnoZS.energyMatrix(seedSC,12));
     
     nPho_++;
   }

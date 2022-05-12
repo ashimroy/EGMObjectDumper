@@ -18,6 +18,7 @@
 
 #include "../interface/egmNtuplizer.h"
 #include "RecoEcal/EgammaCoreTools/interface/EcalClusterLazyTools.h"
+#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 using namespace std;
 using namespace edm;
 
@@ -26,10 +27,8 @@ void setbit(UShort_t& x, UShort_t bit) {
   x |= (a << bit);
 }
 
-egmNtuplizer::egmNtuplizer(const edm::ParameterSet& iConfig) 
-//egmNtuplizer::egmNtuplizer(const edm::ParameterSet& iConfig) :
-  //electronCollection_(consumes<edm::View<reco::GsfElectron> >(iConfig.getParameter<edm::InputTag>("electrons")))
-  //hltPrescaleProvider_(iConfig, consumesCollector(), *this)
+egmNtuplizer::egmNtuplizer(const edm::ParameterSet& iConfig) :
+  ecalClusterESGetTokens_{consumesCollector()}
 {
 #ifdef THIS_IS_AN_EVENTSETUP_EXAMPLE
   setupDataToken_ = esConsumes<SetupData, SetupRecord>();
@@ -59,6 +58,7 @@ egmNtuplizer::egmNtuplizer(const edm::ParameterSet& iConfig)
 
   electronCollection_         = consumes<View<pat::Electron> > (iConfig.getParameter<InputTag>("electronSrc"));
   photonCollection_           = consumes<View<pat::Photon> >   (iConfig.getParameter<InputTag>("photonSrc"));
+
   ebReducedRecHitCollection_  = consumes<EcalRecHitCollection> (iConfig.getParameter<InputTag>("ebReducedRecHitCollection"));
   eeReducedRecHitCollection_  = consumes<EcalRecHitCollection> (iConfig.getParameter<InputTag>("eeReducedRecHitCollection"));
   esReducedRecHitCollection_  = consumes<EcalRecHitCollection> (iConfig.getParameter<InputTag>("esReducedRecHitCollection"));
@@ -93,10 +93,6 @@ egmNtuplizer::~egmNtuplizer() {
 void egmNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
   using namespace edm;
 
-  //AR  for (const auto& track : iEvent.get(tracksToken_)) {
-    // do something with track parameters, e.g, plot the charge.
-    // int charge = track.charge();
-  //AR }
 
   fillGlobalEvent(iEvent, iSetup);
   if (!iEvent.isRealData()) {
@@ -138,17 +134,6 @@ void egmNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 #endif
 }
 
-/*
-// ------------ method called once each job just before starting event loop  ------------
-void egmNtuplizer::beginJob() {
-  // please remove this method if not needed
-}
-
-// ------------ method called once each job just after ending the event loop  ------------
-void egmNtuplizer::endJob() {
-  // please remove this method if not needed
-}
-*/
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
 void egmNtuplizer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   //The following says we do not know what parameters are allowed so do no validation

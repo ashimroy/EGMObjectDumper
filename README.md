@@ -3,13 +3,13 @@ This package dumps electron and photon related variables into a flat tree. The p
 
 How to Install?
 
-cmsrel CMSSW_11_1_0_pre8
+cmsrel CMSSW_12_2_1
 
-cd CMSSW_11_1_0_pre8/src
+cd CMSSW_12_2_1/src
 
 cmsenv
 
-git clone https://github.com/ashimroy/EGMObjectDumper
+git clone -b 12_X https://github.com/ashimroy/EGMObjectDumper
 
 scram b -j8
 
