@@ -51,6 +51,9 @@ vector<float>  elePFNeuIso_;
 vector<float>  elePFPUIso_;
 vector<float>  elePFClusEcalIso_;
 vector<float>  elePFClusHcalIso_;
+vector<float>  eleTrkIso_;
+vector<float>  eleTrkSumPtConeDR03_;
+vector<float>  eleTrkSumPtConeDR04_;
 vector<float>  eleIDMVAIso_;
 vector<float>  eleIDMVANoIso_;
 vector<float>  eleR9Full5x5_;
@@ -88,16 +91,19 @@ void egmNtuplizer::branchesElectrons(TTree* tree) {
   tree->Branch("eleSCEtaWidth",           &eleSCEtaWidth_);
   tree->Branch("eleSCPhiWidth",           &eleSCPhiWidth_);
   tree->Branch("eleHoverE",               &eleHoverE_);
-  tree->Branch("elePFClusEcalIso",        &elePFClusEcalIso_);
-  tree->Branch("elePFClusHcalIso",        &elePFClusHcalIso_);
-
-  tree->Branch("eleSigmaIEtaIEtaFull5x5", &eleSigmaIEtaIEtaFull5x5_);
-  tree->Branch("eleSigmaIPhiIPhiFull5x5", &eleSigmaIPhiIPhiFull5x5_);
+  tree->Branch("eleR9Full5x5",                &eleR9Full5x5_);
   tree->Branch("elePFChIso",              &elePFChIso_);
   tree->Branch("elePFPhoIso",             &elePFPhoIso_);
   tree->Branch("elePFNeuIso",             &elePFNeuIso_);
   tree->Branch("elePFPUIso",              &elePFPUIso_);
-  tree->Branch("eleR9Full5x5",                &eleR9Full5x5_);
+  tree->Branch("elePFClusEcalIso",        &elePFClusEcalIso_);
+  tree->Branch("elePFClusHcalIso",        &elePFClusHcalIso_);
+  tree->Branch("eleTrkIso",               &eleTrkIso_);
+  tree->Branch("eleTrkSumPtConeDR03", &eleTrkSumPtConeDR03_);
+  tree->Branch("eleTrkSumPtConeDR04", &eleTrkSumPtConeDR04_);
+
+  tree->Branch("eleSigmaIEtaIEtaFull5x5", &eleSigmaIEtaIEtaFull5x5_);
+  tree->Branch("eleSigmaIPhiIPhiFull5x5", &eleSigmaIPhiIPhiFull5x5_);
   tree->Branch("eleEcalDrivenSeed",           &eleEcalDrivenSeed_);
   tree->Branch("eleEnergyMatrix5x5",     &eleEnergyMatrix5x5_);
   tree->Branch("eleEnergyMatrix7x7",     &eleEnergyMatrix7x7_);
@@ -152,6 +158,9 @@ void egmNtuplizer::fillElectrons(const edm::Event &iEvent, const edm::EventSetup
   eleHoverE_                  .clear();
   elePFClusEcalIso_           .clear();
   elePFClusHcalIso_           .clear();
+  eleTrkIso_                  .clear();
+  eleTrkSumPtConeDR03_        .clear();
+  eleTrkSumPtConeDR04_        .clear();
 
   eleSigmaIEtaIEtaFull5x5_    .clear();
   eleSigmaIPhiIPhiFull5x5_    .clear();
@@ -210,6 +219,9 @@ void egmNtuplizer::fillElectrons(const edm::Event &iEvent, const edm::EventSetup
     eleHoverE_          .push_back(iEle->hcalOverEcal());
     elePFClusEcalIso_   .push_back(iEle->ecalPFClusterIso());
     elePFClusHcalIso_   .push_back(iEle->hcalPFClusterIso());
+    eleTrkIso_          .push_back(iEle->trackIso());  // Returns the summed Et in a cone of deltaR<0.4 or trkSumPtConeDR04
+    eleTrkSumPtConeDR03_.push_back(iEle->dr03TkSumPt());
+    eleTrkSumPtConeDR04_.push_back(iEle->dr04TkSumPt());
 
     reco::GsfElectron::PflowIsolationVariables pfIso = iEle->pfIsolationVariables();
     elePFChIso_         .push_back(pfIso.sumChargedHadronPt);
