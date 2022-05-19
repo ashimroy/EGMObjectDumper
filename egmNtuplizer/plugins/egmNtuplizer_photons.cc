@@ -45,6 +45,12 @@ vector<float>  phoPFChWorstVetoIso_;
 vector<float>  phoPFChWorstIso_;
 vector<float>  phoEcalPFClusterIso_;
 vector<float>  phoHcalPFClusterIso_;
+vector<float>  phoTrkIso_;
+vector<float>  phoTrkSumPtSolidConeDR03_;
+vector<float>  phoTrkSumPtHollowConeDR03_;
+vector<float>  phoTrkSumPtSolidConeDR04_;
+vector<float>  phoTrkSumPtHollowConeDR04_;
+
 //vector<float>  phoSeedBCE_;
 //vector<float>  phoSeedBCEta_;
 vector<float>  phoIDMVA_;
@@ -114,6 +120,12 @@ void egmNtuplizer::branchesPhotons(TTree* tree) {
   tree->Branch("phoPFChWorstVetoIso",     &phoPFChWorstVetoIso_);
   tree->Branch("phoEcalPFClusterIso",     &phoEcalPFClusterIso_);
   tree->Branch("phoHcalPFClusterIso",     &phoHcalPFClusterIso_);
+  //tree->Branch("phoTrkIso",               &phoTrkIso_);
+  tree->Branch("phoTrkSumPtSolidConeDR03", &phoTrkSumPtSolidConeDR03_);
+  tree->Branch("phoTrkSumPtHollowConeDR03", &phoTrkSumPtHollowConeDR03_);
+  tree->Branch("phoTrkSumPtSolidConeDR04", &phoTrkSumPtSolidConeDR04_);
+  tree->Branch("phoTrkSumPtHollowConeDR04", &phoTrkSumPtHollowConeDR04_);
+  
   tree->Branch("phoSeedTime",             &phoSeedTime_);
   tree->Branch("phoSeedEnergy",           &phoSeedEnergy_);
   tree->Branch("phoSeediEta",             &phoSeediEta_);
@@ -170,6 +182,12 @@ void egmNtuplizer::fillPhotons(const edm::Event& iEvent, const edm::EventSetup& 
   phoPFChWorstIso_        .clear();
   phoEcalPFClusterIso_    .clear();
   phoHcalPFClusterIso_    .clear();
+  phoTrkIso_              .clear();
+  phoTrkSumPtSolidConeDR03_.clear();
+  phoTrkSumPtHollowConeDR03_.clear();
+  phoTrkSumPtSolidConeDR04_.clear();
+  phoTrkSumPtHollowConeDR04_.clear();
+  
   phoSeedTime_            .clear();
   phoSeedEnergy_          .clear();
   phoSeediEta_            .clear();
@@ -241,7 +259,12 @@ void egmNtuplizer::fillPhotons(const edm::Event& iEvent, const edm::EventSetup& 
     phoPFChWorstVetoIso_.push_back(iPho->chargedHadronWorstVtxGeomVetoIso()); //as chargedHadronWorstVtxIso but an additional geometry based veto cone
     phoEcalPFClusterIso_.push_back(iPho->ecalPFClusterIso());
     phoHcalPFClusterIso_.push_back(iPho->hcalPFClusterIso());
-
+    phoTrkIso_          .push_back(iPho->trackIso());  // Returns the summed Et in a cone of deltaR<0.4 or trkSumPtSolidConeDR04
+    phoTrkSumPtSolidConeDR03_.push_back(iPho->trkSumPtSolidConeDR03());
+    phoTrkSumPtHollowConeDR03_.push_back(iPho->trkSumPtHollowConeDR03());
+    phoTrkSumPtSolidConeDR04_.push_back(iPho->trkSumPtSolidConeDR04());
+    phoTrkSumPtHollowConeDR04_.push_back(iPho->trkSumPtHollowConeDR04());
+    
     const auto &seedSC = *(iPho->superCluster()->seed());
     DetId seedDetId = (iPho->superCluster()->seed()->hitsAndFractions())[0].first;
     bool isBarrel = seedDetId.subdetId() == EcalBarrel;
